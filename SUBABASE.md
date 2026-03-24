@@ -1,0 +1,5 @@
+project name: orange-mali
+password: 528deut3wBIHqZy4
+
+VITE_SUPABASE_URL=https://ibnscabashixestseais.supabase.co
+VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY=sb_publishable_94pynZjz19VWg-P5eQKI9w_iLW5drwr
