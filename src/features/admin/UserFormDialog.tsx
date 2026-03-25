@@ -48,24 +48,17 @@ export function UserFormDialog({ open, onClose, onSaved, editUser, supervisors }
       onSaved()
       onClose()
     } else {
-      const { data: { session } } = await supabase.auth.getSession()
-      const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-user`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session?.access_token}`,
-        },
-        body: JSON.stringify({
+      const { data, error: fnError } = await supabase.functions.invoke('create-user', {
+        body: {
           telephone,
           first_name: firstName,
           last_name: lastName,
           role,
           zone: zone || null,
           parent_id: parentId || null,
-        }),
+        },
       })
-      const data = await res.json()
-      if (!res.ok) { toast.error(data.error); setLoading(false); return }
+      if (fnError) { toast.error(fnError.message); setLoading(false); return }
       setCreatedCreds({ login: data.display_login, password: data.default_password })
       toast.success('Utilisateur créé')
       onSaved()
