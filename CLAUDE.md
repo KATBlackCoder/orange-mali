@@ -56,7 +56,34 @@ When modifying or adding skills, maintain the existing structure: `SKILL.md` for
 PWA mobile-first remplaçant Google Forms pour un service terrain partenaire d'Orange Money Mali.
 Plans d'implémentation : `docs/plans/2026-03-24-orange-mali-pwa.md` (index) → 7 plans séquentiels.
 
-**Stack :** React 19 + TypeScript + Vite, Tailwind CSS v4, shadcn/ui, Supabase, Vercel
+**Stack :** React 19 + TypeScript + Vite 8, Tailwind CSS v4, shadcn/ui, Supabase, Vercel
+
+**Supabase project :** `orange-mali` — ID `ibnscabashixestseais`
+
+**Avancement :**
+| Chunk | Statut | Contenu |
+|-------|--------|---------|
+| 01 Setup | ✅ | Vite + Tailwind v4 + shadcn + Supabase client |
+| 02 Database | ✅ | Schéma PostgreSQL + RLS policies |
+| 03 Auth | ✅ | Login par téléphone, routing protégé |
+| 04 Saisie en masse | ✅ | BulkEntryTable, useSubmission, ProfileContext |
+| 05 Dashboards | 🔲 | Vues par rôle (employe, superviseur, chef) |
+| 06 Admin | 🔲 | CRUD users + Form Builder + Edge Function |
+| 07 Deploy | 🔲 | Export CSV + Vercel |
+
+**Conventions auth :**
+- Email Supabase Auth interne : `telephone@orangemali.local`
+- Login affiché : `telephone@last_name.org`
+- Password par défaut : `ML` + telephone
+- `must_change_password = true` à la création → page changement au 1er login
+- Seuls `chef` et `sous_chef` créent des comptes (via Edge Function `create-user`)
+
+**Commandes :**
+```bash
+pnpm dev          # Dev local
+pnpm build        # Build production
+pnpm dlx supabase gen types typescript --project-id ibnscabashixestseais > src/lib/database.types.ts
+```
 
 ### hoshi-trans
 Japanese game translation tooling. Répertoire : `/home/blackat/project/hoshi-trans/`
