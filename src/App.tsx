@@ -1,9 +1,10 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from '@/components/ui/sonner'
 import { useAuth } from '@/features/auth/useAuth'
-import { useProfile } from '@/contexts/ProfileContext'
-import { ProfileProvider } from '@/contexts/ProfileContext'
+import { useProfile, ProfileProvider } from '@/contexts/ProfileContext'
 import { LoginPage } from '@/features/auth/LoginPage'
+import { DashboardRouter } from '@/features/dashboard/DashboardRouter'
+import { Layout } from '@/components/Layout'
 import { SubmissionPage } from '@/features/submissions/SubmissionPage'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -21,12 +22,12 @@ function AppRoutes() {
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/submit/:formId" element={
-        <ProtectedRoute><SubmissionPage /></ProtectedRoute>
+        <ProtectedRoute>
+          <Layout><SubmissionPage /></Layout>
+        </ProtectedRoute>
       } />
       <Route path="/*" element={
-        <ProtectedRoute>
-          <div className="p-4">Dashboard (à venir)</div>
-        </ProtectedRoute>
+        <ProtectedRoute><DashboardRouter /></ProtectedRoute>
       } />
     </Routes>
   )
