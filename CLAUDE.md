@@ -67,8 +67,8 @@ Plans d'implémentation : `docs/plans/2026-03-24-orange-mali-pwa.md` (index) →
 | 02 Database | ✅ | Schéma PostgreSQL + RLS policies |
 | 03 Auth | ✅ | Login par téléphone, routing protégé |
 | 04 Saisie en masse | ✅ | BulkEntryTable, useSubmission, ProfileContext |
-| 05 Dashboards | 🔲 | Vues par rôle (employe, superviseur, chef) |
-| 06 Admin | 🔲 | CRUD users + Form Builder + Edge Function |
+| 05 Dashboards | ✅ | Vues par rôle (employe, superviseur, chef) |
+| 06 Admin | ✅ | CRUD users + Form Builder + Edge Function |
 | 07 Deploy | 🔲 | Export CSV + Vercel |
 
 **Conventions auth :**
