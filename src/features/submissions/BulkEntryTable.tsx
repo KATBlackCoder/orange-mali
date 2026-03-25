@@ -1,0 +1,119 @@
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Badge } from '@/components/ui/badge'
+import { Plus, Trash2 } from 'lucide-react'
+import type { Tables } from '@/lib/database.types'
+import type { RowData } from './useSubmission'
+
+type FormField = Omit<Tables<'form_fields'>, 'id'> & { id: string }
+
+interface Props {
+  fields: Tables<'form_fields'>[]
+  rows: RowData[]
+  onUpdate: (rowIndex: number, fieldId: string, value: string) => void
+  onAddRow: () => void
+  onAddRows: (n: number) => void
+  onRemoveRow: (rowIndex: number) => void
+  onSave: () => void
+  onSubmit: () => void
+  saving: boolean
+}
+
+const sortedFields = (fields: FormField[]) => [...fields].sort((a, b) => a.ordre - b.ordre)
+
+export function BulkEntryTable({ fields, rows, onUpdate, onAddRow, onAddRows, onRemoveRow, onSave, onSubmit, saving }: Props) {
+  const [bulkCount, setBulkCount] = useState(10)
+  const ordered = sortedFields(fields)
+
+  return (
+    <div className="space-y-4">
+      {/* Toolbar */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <Button variant="outline" size="sm" onClick={onAddRow}>
+          <Plus className="w-4 h-4 mr-1" /> Ajouter 1 ligne
+        </Button>
+        <div className="flex items-center gap-1">
+          <Input
+            type="number" min={1} max={200}
+            value={bulkCount}
+            onChange={e => setBulkCount(Number(e.target.value))}
+            className="w-20 h-8"
+          />
+          <Button variant="outline" size="sm" onClick={() => onAddRows(bulkCount)}>
+            + {bulkCount} lignes
+          </Button>
+        </div>
+        <Badge variant="secondary">{rows.length} ligne{rows.length > 1 ? 's' : ''}</Badge>
+      </div>
+
+      {/* Tableau */}
+      <div className="overflow-x-auto rounded-md border">
+        <table className="w-full text-sm">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="w-8 px-2 py-2 text-left text-gray-500 font-normal">#</th>
+              {ordered.map(f => (
+                <th key={f.id} className="px-3 py-2 text-left font-medium whitespace-nowrap">
+                  {f.label}
+                  {f.requis && <span className="text-red-500 ml-1">*</span>}
+                </th>
+              ))}
+              <th className="w-8" />
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row, i) => (
+              <tr key={i} className="border-t hover:bg-gray-50">
+                <td className="px-2 py-1 text-gray-400 text-xs">{i + 1}</td>
+                {ordered.map(f => {
+                  return (
+                  <td key={f.id} className="px-1 py-1">
+                    {f.type === 'select' && f.options ? (
+                      <Select value={row[f.id ?? ''] ?? ''} onValueChange={v => onUpdate(i, f.id ?? '', v as string)}>
+                        <SelectTrigger className="h-8 min-w-30">
+                          <SelectValue placeholder="Choisir..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {(f.options as string[]).map(opt => (
+                            <SelectItem key={opt} value={opt ?? ''}>{opt}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <Input
+                        type={f.type === 'number' ? 'number' : f.type === 'tel' ? 'tel' : f.type === 'date' ? 'date' : 'text'}
+                        value={row[f.id ?? ''] ?? ''}
+                        onChange={e => onUpdate(i, f.id ?? '', e.target.value)}
+                        className="h-8 min-w-35"
+                        placeholder={f.label}
+                      />
+                    )}
+                  </td>
+                  )
+                })}
+                <td className="px-1">
+                  <Button variant="ghost" size="icon" className="h-7 w-7 text-gray-400 hover:text-red-500"
+                    onClick={() => onRemoveRow(i)}>
+                    <Trash2 className="w-3 h-3" />
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Actions */}
+      <div className="flex gap-2 justify-end">
+        <Button variant="outline" onClick={onSave} disabled={saving}>
+          {saving ? 'Sauvegarde...' : 'Sauvegarder brouillon'}
+        </Button>
+        <Button className="bg-orange-500 hover:bg-orange-600" onClick={onSubmit} disabled={saving}>
+          Soumettre
+        </Button>
+      </div>
+    </div>
+  )
+}

@@ -93,6 +93,9 @@
       "Bash(cp /home/blackat/project/hoshi-trans/src-tauri/modelfiles/hoshi-translator-30b.Modelfile /home/blackat/project/hoshi-trans/src-tauri/modelfiles/hoshi-translator-30b-trans.Modelfile)",
       "WebFetch(domain:docs.ollama.com)",
       "Bash(pnpm add:*)"
+    ],
+    "additionalDirectories": [
+      "/tmp"
     ]
   },
   "enableAllProjectMcpServers": true,
