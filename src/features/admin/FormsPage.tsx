@@ -4,6 +4,7 @@ import { supabase } from '@/lib/supabase'
 import { useProfile } from '@/contexts/ProfileContext'
 import { Button } from '@/components/ui/button'
 import { Plus, Pencil } from 'lucide-react'
+import { ExportButton } from './ExportButton'
 import type { Tables } from '@/lib/database.types'
 
 type Form = Tables<'forms'>
@@ -45,6 +46,7 @@ export function FormsPage() {
               <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${f.actif ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
                 {f.actif ? 'Actif' : 'Inactif'}
               </span>
+              <ExportButton formId={f.id} formName={f.nom} />
               <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => navigate(`/forms/${f.id}/edit`)}>
                 <Pencil className="w-3.5 h-3.5" />
               </Button>
