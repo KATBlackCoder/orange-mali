@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -29,6 +29,19 @@ export function UserFormDialog({ open, onClose, onSaved, editUser, supervisors }
 
   const [loading, setLoading] = useState(false)
   const [createdCreds, setCreatedCreds] = useState<{ login: string; password: string } | null>(null)
+
+  useEffect(() => {
+    if (open) {
+      setFirstName(editUser?.first_name ?? '')
+      setLastName(editUser?.last_name ?? '')
+      setTelephone(editUser?.telephone ?? '')
+      setRole((editUser?.role as UserRole) ?? 'employe')
+      setZone(editUser?.zone ?? '')
+      setParentId(editUser?.parent_id ?? '')
+      setCreatedCreds(null)
+      setLoading(false)
+    }
+  }, [open, editUser])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
