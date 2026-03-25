@@ -4,19 +4,32 @@ import { useAuth } from '@/features/auth/useAuth'
 import type { Tables } from '@/lib/database.types'
 
 type Profile = Tables<'profiles'>
-const ProfileContext = createContext<Profile | null>(null)
 
-export function ProfileProvider({ children }: { children: React.ReactNode }) {
-  const { user } = useAuth()
-  const [profile, setProfile] = useState<Profile | null>(null)
-
-  useEffect(() => {
-    if (!user) { setProfile(null); return }
-    supabase.from('profiles').select('*').eq('id', user.id).single()
-      .then(({ data }) => setProfile(data))
-  }, [user])
-
-  return <ProfileContext.Provider value={profile}>{children}</ProfileContext.Provider>
+interface ProfileContextValue {
+  profile: Profile | null
+  profileLoaded: boolean
 }
 
-export const useProfile = () => useContext(ProfileContext)
+const ProfileContext = createContext<ProfileContextValue>({ profile: null, profileLoaded: false })
+
+export function ProfileProvider({ children }: { children: React.ReactNode }) {
+  const { user, loading: authLoading } = useAuth()
+  const [profile, setProfile] = useState<Profile | null>(null)
+  const [profileLoaded, setProfileLoaded] = useState(false)
+
+  useEffect(() => {
+    if (authLoading) return
+    if (!user) { setProfile(null); setProfileLoaded(true); return }
+    supabase.from('profiles').select('*').eq('id', user.id).single()
+      .then(({ data }) => { setProfile(data); setProfileLoaded(true) })
+  }, [user, authLoading])
+
+  return (
+    <ProfileContext.Provider value={{ profile, profileLoaded }}>
+      {children}
+    </ProfileContext.Provider>
+  )
+}
+
+export const useProfile = () => useContext(ProfileContext).profile
+export const useProfileLoaded = () => useContext(ProfileContext).profileLoaded

@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from '@/components/ui/sonner'
 import { useAuth } from '@/features/auth/useAuth'
-import { useProfile, ProfileProvider } from '@/contexts/ProfileContext'
+import { useProfileLoaded, ProfileProvider } from '@/contexts/ProfileContext'
 import { LoginPage } from '@/features/auth/LoginPage'
 import { DashboardRouter } from '@/features/dashboard/DashboardRouter'
 import { Layout } from '@/components/Layout'
@@ -9,8 +9,8 @@ import { SubmissionPage } from '@/features/submissions/SubmissionPage'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth()
-  const profile = useProfile()
-  if (loading || (user && !profile)) return (
+  const profileLoaded = useProfileLoaded()
+  if (loading || !profileLoaded) return (
     <div className="flex items-center justify-center min-h-screen text-gray-500">Chargement...</div>
   )
   if (!user) return <Navigate to="/login" replace />
