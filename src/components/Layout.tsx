@@ -1,5 +1,5 @@
 import { useNavigate, Link } from 'react-router-dom'
-import { LogOut, User, Users, FileText } from 'lucide-react'
+import { LogOut, User, Users, FileText, History } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { signOut } from '@/lib/auth'
 import { useProfile } from '@/contexts/ProfileContext'
@@ -30,6 +30,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
               <span className="hidden sm:inline">Formulaires</span>
             </Link>
           </>)}
+          {profile && ['chef', 'sous_chef', 'superviseur'].includes(profile.role) && (
+            <Link to="/history" className="flex items-center gap-1 text-white text-sm opacity-80 hover:opacity-100">
+              <History className="w-4 h-4" />
+              <span className="hidden sm:inline">Historique</span>
+            </Link>
+          )}
         </div>
         <div className="flex items-center gap-3">
           {profile && (

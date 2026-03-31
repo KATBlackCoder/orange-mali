@@ -10,6 +10,8 @@ import { SubmissionPage } from '@/features/submissions/SubmissionPage'
 import { UsersPage } from '@/features/admin/UsersPage'
 import { FormsPage } from '@/features/admin/FormsPage'
 import { FormBuilder } from '@/features/admin/FormBuilder'
+import { HistoryPage } from '@/features/submissions/HistoryPage'
+import { SubmissionDetailPage } from '@/features/submissions/SubmissionDetailPage'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth()
@@ -50,6 +52,16 @@ function AppRoutes() {
       <Route path="/submit/:formId" element={
         <ProtectedRoute>
           <Layout><SubmissionPage /></Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/history" element={
+        <ProtectedRoute>
+          <Layout><HistoryPage /></Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/submissions/:id" element={
+        <ProtectedRoute>
+          <Layout><SubmissionDetailPage /></Layout>
         </ProtectedRoute>
       } />
       <Route path="/*" element={

@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import { CheckCircle, XCircle } from 'lucide-react'
+import { MyTeamSection } from './MyTeamSection'
 
 export function SupervisorDashboard() {
   const profile = useProfile()
@@ -95,6 +96,8 @@ export function SupervisorDashboard() {
           </div>
         </div>
       )}
+
+      <MyTeamSection />
     </div>
   )
 }
