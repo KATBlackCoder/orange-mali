@@ -57,7 +57,7 @@ export function FieldEditor({ field, allFields, onUpdate, onRemove }: Props) {
             onChange={e => onUpdate(field.id, { label: e.target.value })}
           />
           <Select value={field.type} onValueChange={v => onUpdate(field.id, { type: v as string })}>
-            <SelectTrigger className="w-36"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="w-48"><SelectValue /></SelectTrigger>
             <SelectContent>
               {FIELD_TYPES.map(t => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
             </SelectContent>
