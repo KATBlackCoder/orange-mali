@@ -1,4 +1,5 @@
 import { useSortable } from '@dnd-kit/sortable'
+import { useState } from 'react'
 import { CSS } from '@dnd-kit/utilities'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -39,6 +40,7 @@ export function FieldEditor({ field, allFields, onUpdate, onRemove }: Props) {
   }
 
   const options = Array.isArray(field.options) ? (field.options as string[]) : []
+  const [optionsText, setOptionsText] = useState(options.join('\n'))
 
   return (
     <div ref={setNodeRef} style={style}
@@ -58,7 +60,7 @@ export function FieldEditor({ field, allFields, onUpdate, onRemove }: Props) {
           />
           <Select value={field.type} onValueChange={v => onUpdate(field.id, { type: v as string })}>
             <SelectTrigger className="w-48"><SelectValue /></SelectTrigger>
-            <SelectContent>
+            <SelectContent className="min-w-56">
               {FIELD_TYPES.map(t => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
             </SelectContent>
           </Select>
@@ -69,8 +71,11 @@ export function FieldEditor({ field, allFields, onUpdate, onRemove }: Props) {
             <p className="text-xs text-gray-500">Options (une par ligne)</p>
             <textarea
               className="w-full text-sm border rounded px-2 py-1 min-h-15 resize-y"
-              value={options.join('\n')}
-              onChange={e => onUpdate(field.id, { options: e.target.value.split('\n').filter(Boolean) as string[] })}
+              value={optionsText}
+              onChange={e => {
+                setOptionsText(e.target.value)
+                onUpdate(field.id, { options: e.target.value.split('\n').filter(Boolean) as string[] })
+              }}
               placeholder="Option 1&#10;Option 2&#10;Option 3"
             />
           </div>
