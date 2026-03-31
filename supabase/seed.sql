@@ -13,6 +13,36 @@
 -- Pour tout supprimer : exécuter le bloc DELETE en bas de ce fichier
 -- =============================================================
 
+-- ─── Nettoyage préalable des données de test ──────────────────────────────
+DELETE FROM row_values WHERE row_id IN (
+  SELECT sr.id FROM submission_rows sr
+  JOIN submissions s ON s.id = sr.submission_id
+  JOIN profiles p ON p.id = s.user_id
+  WHERE p.first_name LIKE 'TEST_%'
+);
+DELETE FROM submission_rows WHERE submission_id IN (
+  SELECT s.id FROM submissions s
+  JOIN profiles p ON p.id = s.user_id
+  WHERE p.first_name LIKE 'TEST_%'
+);
+DELETE FROM submissions WHERE user_id IN (
+  SELECT id FROM profiles WHERE first_name LIKE 'TEST_%'
+);
+DELETE FROM form_fields WHERE form_id IN (
+  SELECT id FROM forms WHERE nom LIKE 'TEST_%'
+);
+DELETE FROM forms WHERE nom LIKE 'TEST_%';
+DELETE FROM profiles WHERE first_name LIKE 'TEST_%';
+DELETE FROM auth.users
+  WHERE email LIKE '%@orangemali.local'
+  AND id IN (
+    'a0000000-0000-0000-0000-000000000001',
+    'a0000000-0000-0000-0000-000000000002',
+    'a0000000-0000-0000-0000-000000000003'
+  );
+DELETE FROM auth.users WHERE email ~ '^70[12][0-9]{6}@orangemali\.local$';
+-- ──────────────────────────────────────────────────────────────────────────
+
 DO $$
 DECLARE
   -- IDs fixes pour les rôles principaux (pour pouvoir se connecter)
