@@ -1,6 +1,6 @@
 # Historique, Détail Soumission & Vue Équipe — Chunk 9
 
-> **For agentic workers:** REQUIRED: Use superpowers:subagent-driven-development (if subagents available) or superpowers:executing-plans to implement this plan. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED: Use superpowers:subagent-driven-development (if subagents available) or superpowers:executing-plans to implement this plan. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Ajouter l'historique complet des soumissions avec filtres, une page de détail par soumission, et une vue "mes employés" pour les superviseurs.
 
@@ -43,7 +43,7 @@ Compléter [Chunk 8: Champs avancés](./2026-03-25-form-fields-advanced.md) en p
 - Chaque ligne cliquable → navigue vers `/submissions/:id`
 - Pagination simple : bouton "Charger plus" (50 par page)
 
-- [ ] **Step 1: Créer `src/features/submissions/HistoryPage.tsx`**
+- [x] **Step 1: Créer `src/features/submissions/HistoryPage.tsx`**
 
 ```tsx
 import { useEffect, useState } from 'react'
@@ -181,7 +181,7 @@ export function HistoryPage() {
 }
 ```
 
-- [ ] **Step 2: Ajouter la route `/history` dans `src/App.tsx`**
+- [x] **Step 2: Ajouter la route `/history` dans `src/App.tsx`**
 
 Ajouter l'import en haut :
 ```tsx
@@ -197,7 +197,7 @@ Ajouter la route dans `AppRoutes` avant la route `/*` :
 } />
 ```
 
-- [ ] **Step 3: Ajouter le lien "Historique" dans `src/components/Layout.tsx`**
+- [x] **Step 3: Ajouter le lien "Historique" dans `src/components/Layout.tsx`**
 
 Ajouter l'import `History` depuis `lucide-react` :
 ```tsx
@@ -216,7 +216,7 @@ Ajouter le lien après le lien "Formulaires", visible par `chef`, `sous_chef` **
 
 Note : le lien "Utilisateurs" et "Formulaires" reste réservé à `chef`/`sous_chef` uniquement.
 
-- [ ] **Step 4: Vérifier visuellement**
+- [x] **Step 4: Vérifier visuellement**
 
 1. Se connecter avec le compte chef → le lien "Historique" apparaît dans le header
 2. Se connecter avec un superviseur → le lien "Historique" apparaît aussi
@@ -224,7 +224,7 @@ Note : le lien "Utilisateurs" et "Formulaires" reste réservé à `chef`/`sous_c
 4. Vérifier que les filtres filtrent bien la liste
 5. Vérifier que cliquer sur une ligne navigue vers `/submissions/:id` (page 404 pour l'instant, normal)
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/features/submissions/HistoryPage.tsx src/App.tsx src/components/Layout.tsx
@@ -245,7 +245,7 @@ git commit -m "feat: history page with filters for chef/sous-chef/superviseur"
 - Tableau avec toutes les lignes de la soumission et leurs valeurs
 - Boutons Valider / Rejeter visibles pour superviseur/chef/sous_chef si statut = `soumis`
 
-- [ ] **Step 1: Créer `src/features/submissions/SubmissionDetailPage.tsx`**
+- [x] **Step 1: Créer `src/features/submissions/SubmissionDetailPage.tsx`**
 
 ```tsx
 import { useEffect, useState } from 'react'
@@ -382,7 +382,7 @@ export function SubmissionDetailPage() {
 }
 ```
 
-- [ ] **Step 2: Ajouter la route `/submissions/:id` dans `src/App.tsx`**
+- [x] **Step 2: Ajouter la route `/submissions/:id` dans `src/App.tsx`**
 
 Ajouter l'import :
 ```tsx
@@ -398,7 +398,7 @@ Ajouter la route avant la route `/*` :
 } />
 ```
 
-- [ ] **Step 3: Vérifier visuellement**
+- [x] **Step 3: Vérifier visuellement**
 
 1. Aller sur `/history`, cliquer sur une remontée → page détail s'affiche
 2. Vérifier que le tableau des lignes correspond aux données saisies
@@ -406,7 +406,7 @@ Ajouter la route avant la route `/*` :
 4. Valider → statut passe à "Validé", boutons disparaissent
 5. Bouton retour → revient à la page précédente
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add src/features/submissions/SubmissionDetailPage.tsx src/App.tsx
@@ -427,7 +427,7 @@ git commit -m "feat: submission detail page with validate/reject actions"
 - Pour chaque employé : nom, téléphone, + indicateur "a soumis aujourd'hui" (point vert) ou "pas de remontée aujourd'hui" (point gris)
 - Pas d'action — vue consultation uniquement
 
-- [ ] **Step 1: Créer `src/features/dashboard/MyTeamSection.tsx`**
+- [x] **Step 1: Créer `src/features/dashboard/MyTeamSection.tsx`**
 
 ```tsx
 import { useEffect, useState } from 'react'
@@ -492,7 +492,7 @@ export function MyTeamSection() {
 }
 ```
 
-- [ ] **Step 2: Intégrer `MyTeamSection` dans `src/features/dashboard/SupervisorDashboard.tsx`**
+- [x] **Step 2: Intégrer `MyTeamSection` dans `src/features/dashboard/SupervisorDashboard.tsx`**
 
 Ajouter l'import :
 ```tsx
@@ -504,14 +504,14 @@ Ajouter le composant à la fin du JSX, après la section "Traitées récemment" 
 <MyTeamSection />
 ```
 
-- [ ] **Step 3: Vérifier visuellement**
+- [x] **Step 3: Vérifier visuellement**
 
 1. Se connecter avec le compte superviseur
 2. Vérifier que la section "Mon équipe" apparaît avec les employés rattachés
 3. Si un employé a soumis une remontée aujourd'hui → point vert + "Actif aujourd'hui"
 4. Si aucun employé rattaché → section absente (pas d'erreur)
 
-- [ ] **Step 4: Build final**
+- [x] **Step 4: Build final**
 
 ```bash
 pnpm build
@@ -519,7 +519,7 @@ pnpm build
 
 Attendu : `✓ built` sans erreur.
 
-- [ ] **Step 5: Commit et push**
+- [x] **Step 5: Commit et push**
 
 ```bash
 git add src/features/dashboard/MyTeamSection.tsx src/features/dashboard/SupervisorDashboard.tsx

@@ -71,6 +71,7 @@ Plans d'implémentation : `docs/plans/2026-03-24-orange-mali-pwa.md` (index) →
 | 06 Admin | ✅ | CRUD users + Form Builder + Edge Function |
 | 07 Deploy | ✅ | Export CSV + Vercel (https://orange-mali.vercel.app) |
 | 08 Champs avancés | ✅ | Multiselect + champs conditionnels |
+| 09 Historique & équipe | ✅ | HistoryPage `/history`, SubmissionDetailPage `/submissions/:id`, MyTeamSection superviseur |
 
 **Conventions auth :**
 - Email Supabase Auth interne : `telephone@orangemali.local`
