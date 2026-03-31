@@ -8,6 +8,11 @@ import type { Tables } from '@/lib/database.types'
 
 type Field = Tables<'form_fields'>
 
+interface FieldCondition {
+  fieldId: string
+  value: string
+}
+
 const FIELD_TYPES = [
   { value: 'text', label: 'Texte' },
   { value: 'tel', label: 'Téléphone' },
@@ -19,11 +24,12 @@ const FIELD_TYPES = [
 
 interface Props {
   field: Field
+  allFields: Field[]
   onUpdate: (id: string, updates: Partial<Field>) => void
   onRemove: (id: string) => void
 }
 
-export function FieldEditor({ field, onUpdate, onRemove }: Props) {
+export function FieldEditor({ field, allFields, onUpdate, onRemove }: Props) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: field.id })
 
   const style = {
@@ -75,6 +81,52 @@ export function FieldEditor({ field, onUpdate, onRemove }: Props) {
             onChange={e => onUpdate(field.id, { requis: e.target.checked })} />
           Champ obligatoire
         </label>
+
+        {(() => {
+          const condition = field.condition as FieldCondition | null
+          const triggerFields = allFields.filter(
+            f => f.id !== field.id && (f.type === 'select' || f.type === 'multiselect')
+          )
+          if (triggerFields.length === 0) return null
+          return (
+            <div className="space-y-1">
+              <label className="flex items-center gap-2 text-xs text-gray-500 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={!!condition}
+                  onChange={e => onUpdate(field.id, {
+                    condition: e.target.checked
+                      ? { fieldId: triggerFields[0].id, value: '' }
+                      : null
+                  } as Partial<Field>)}
+                />
+                Afficher uniquement si...
+              </label>
+              {condition && (
+                <div className="flex gap-2 items-center pl-4">
+                  <Select
+                    value={condition.fieldId}
+                    onValueChange={v => onUpdate(field.id, { condition: { ...condition, fieldId: v } } as Partial<Field>)}
+                  >
+                    <SelectTrigger className="h-7 text-xs w-40"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {triggerFields.map(f => (
+                        <SelectItem key={f.id} value={f.id}>{f.label || '(sans label)'}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <span className="text-xs text-gray-400">=</span>
+                  <Input
+                    className="h-7 text-xs w-32"
+                    placeholder="valeur"
+                    value={condition.value}
+                    onChange={e => onUpdate(field.id, { condition: { ...condition, value: e.target.value } } as Partial<Field>)}
+                  />
+                </div>
+              )}
+            </div>
+          )
+        })()}
       </div>
 
       <Button variant="ghost" size="icon" className="text-red-400 hover:text-red-600 h-8 w-8 mt-1"

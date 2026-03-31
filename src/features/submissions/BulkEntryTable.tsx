@@ -23,6 +23,13 @@ interface Props {
 
 const sortedFields = (fields: FormField[]) => [...fields].sort((a, b) => a.ordre - b.ordre)
 
+function isVisible(field: FormField, row: RowData): boolean {
+  const condition = field.condition as { fieldId: string; value: string } | null
+  if (!condition || !condition.fieldId || !condition.value) return true
+  const sourceValue = row[condition.fieldId] ?? ''
+  return sourceValue === condition.value || sourceValue.split('|').includes(condition.value)
+}
+
 export function BulkEntryTable({ fields, rows, onUpdate, onAddRow, onAddRows, onRemoveRow, onSave, onSubmit, saving }: Props) {
   const [bulkCount, setBulkCount] = useState(10)
   const ordered = sortedFields(fields)
@@ -68,10 +75,22 @@ export function BulkEntryTable({ fields, rows, onUpdate, onAddRow, onAddRows, on
               <tr key={i} className="border-t hover:bg-gray-50">
                 <td className="px-2 py-1 text-gray-400 text-xs">{i + 1}</td>
                 {ordered.map(f => {
+                  const visible = isVisible(f, row)
                   return (
                   <td key={f.id} className="px-1 py-1">
-                    {f.type === 'select' && Array.isArray(f.options) ? (
-                      <Select value={row[f.id ?? ''] ?? ''} onValueChange={v => onUpdate(i, f.id ?? '', v as string)}>
+                    {!visible ? (
+                      <div className="h-8 min-w-20 rounded border border-dashed border-gray-200 bg-gray-50" />
+                    ) : f.type === 'select' && Array.isArray(f.options) ? (
+                      <Select value={row[f.id ?? ''] ?? ''} onValueChange={v => {
+                        onUpdate(i, f.id ?? '', v as string)
+                        ordered.forEach(dep => {
+                          const cond = dep.condition as { fieldId: string; value: string } | null
+                          if (cond?.fieldId === f.id) {
+                            const stillVisible = v === cond.value
+                            if (!stillVisible) onUpdate(i, dep.id, '')
+                          }
+                        })
+                      }}>
                         <SelectTrigger className="h-8 min-w-30">
                           <SelectValue placeholder="Choisir..." />
                         </SelectTrigger>
@@ -95,7 +114,15 @@ export function BulkEntryTable({ fields, rows, onUpdate, onAddRow, onAddRows, on
                                   const next = checked
                                     ? current.filter(v => v !== opt)
                                     : [...current, opt]
-                                  onUpdate(i, f.id ?? '', next.join('|'))
+                                  const joined = next.join('|')
+                                  onUpdate(i, f.id ?? '', joined)
+                                  ordered.forEach(dep => {
+                                    const cond = dep.condition as { fieldId: string; value: string } | null
+                                    if (cond?.fieldId === f.id) {
+                                      const stillVisible = next.includes(cond.value)
+                                      if (!stillVisible) onUpdate(i, dep.id, '')
+                                    }
+                                  })
                                 }}
                               />
                               {opt}

@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       form_fields: {
         Row: {
+          condition: Json | null
           created_at: string | null
           form_id: string | null
           id: string
@@ -26,6 +27,7 @@ export type Database = {
           type: string
         }
         Insert: {
+          condition?: Json | null
           created_at?: string | null
           form_id?: string | null
           id?: string
@@ -36,6 +38,7 @@ export type Database = {
           type: string
         }
         Update: {
+          condition?: Json | null
           created_at?: string | null
           form_id?: string | null
           id?: string

@@ -45,6 +45,7 @@ export function FormBuilder() {
       type: 'text',
       requis: false,
       options: null,
+      condition: null,
       ordre: fields.length,
       created_at: null,
       _new: true,
@@ -95,6 +96,7 @@ export function FormBuilder() {
       type: f.type,
       requis: f.requis,
       options: f.options,
+      condition: f.condition ?? null,
       ordre: i,
     }))
 
@@ -152,7 +154,7 @@ export function FormBuilder() {
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
           <SortableContext items={fields.map(f => f.id)} strategy={verticalListSortingStrategy}>
             {fields.map(field => (
-              <FieldEditor key={field.id} field={field} onUpdate={updateField} onRemove={removeField} />
+              <FieldEditor key={field.id} field={field} allFields={fields} onUpdate={updateField} onRemove={removeField} />
             ))}
           </SortableContext>
         </DndContext>
