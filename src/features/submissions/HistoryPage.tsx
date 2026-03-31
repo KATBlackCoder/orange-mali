@@ -5,6 +5,7 @@ import { useProfile } from '@/contexts/ProfileContext'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Search } from 'lucide-react'
 
 const statutColors: Record<string, string> = {
   brouillon: 'bg-gray-100 text-gray-600',
@@ -26,6 +27,8 @@ export function HistoryPage() {
   const [filterStatut, setFilterStatut] = useState('all')
   const [filterDateFrom, setFilterDateFrom] = useState('')
   const [filterDateTo, setFilterDateTo] = useState('')
+  const [search, setSearch] = useState('')
+  const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc')
   const [page, setPage] = useState(0)
   const PAGE_SIZE = 50
 
@@ -39,7 +42,7 @@ export function HistoryPage() {
     let query = supabase
       .from('submissions')
       .select('id, created_at, statut, user_id, form_id, profiles(first_name, last_name, telephone), forms(nom)')
-      .order('created_at', { ascending: false })
+      .order('created_at', { ascending: sortOrder === 'asc' })
       .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1)
 
     // Superviseur : uniquement les soumissions de ses employés
@@ -56,7 +59,7 @@ export function HistoryPage() {
       else setSubmissions(prev => [...prev, ...(data ?? [])])
       setLoading(false)
     })
-  }, [profile, filterForm, filterStatut, filterDateFrom, filterDateTo, page])
+  }, [profile, filterForm, filterStatut, filterDateFrom, filterDateTo, sortOrder, page])
 
   // Reset pagination when filters change
   function applyFilter(fn: () => void) { setPage(0); fn() }
@@ -64,6 +67,17 @@ export function HistoryPage() {
   return (
     <div className="max-w-4xl mx-auto space-y-4">
       <h2 className="text-lg font-bold">Historique des remontées</h2>
+
+      {/* Recherche */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+        <Input
+          className="pl-9 h-9"
+          placeholder="Rechercher par nom ou téléphone..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+        />
+      </div>
 
       {/* Filtres */}
       <div className="flex flex-wrap gap-2 bg-white border rounded-md p-3">
@@ -92,6 +106,14 @@ export function HistoryPage() {
         <Input type="date" className="h-8 w-36 text-sm"
           value={filterDateTo}
           onChange={e => applyFilter(() => setFilterDateTo(e.target.value ?? ''))} />
+
+        <Select value={sortOrder} onValueChange={v => applyFilter(() => setSortOrder(v as 'desc' | 'asc'))}>
+          <SelectTrigger className="h-8 w-40 text-sm"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="desc">Plus récent d'abord</SelectItem>
+            <SelectItem value="asc">Plus ancien d'abord</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Liste */}
@@ -101,7 +123,13 @@ export function HistoryPage() {
         <p className="text-gray-500 text-sm">Aucune remontée trouvée.</p>
       ) : (
         <div className="divide-y border rounded-md bg-white">
-          {submissions.map(s => (
+          {submissions.filter(s => {
+            if (!search) return true
+            const q = search.toLowerCase()
+            const name = `${s.profiles?.first_name ?? ''} ${s.profiles?.last_name ?? ''}`.toLowerCase()
+            const tel = (s.profiles?.telephone ?? '').toLowerCase()
+            return name.includes(q) || tel.includes(q)
+          }).map(s => (
             <div key={s.id}
               className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-gray-50"
               onClick={() => navigate(`/submissions/${s.id}`)}>
