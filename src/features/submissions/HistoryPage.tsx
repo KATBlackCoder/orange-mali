@@ -82,7 +82,9 @@ export function HistoryPage() {
       {/* Filtres */}
       <div className="flex flex-wrap gap-2 bg-white border rounded-md p-3">
         <Select value={filterForm} onValueChange={v => applyFilter(() => setFilterForm(v ?? 'all'))}>
-          <SelectTrigger className="h-8 w-44 text-sm"><SelectValue placeholder="Formulaire" /></SelectTrigger>
+          <SelectTrigger className="h-8 w-44 text-sm">
+            <span>{filterForm === 'all' ? 'Tous les formulaires' : (forms.find(f => f.id === filterForm)?.nom ?? filterForm)}</span>
+          </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Tous les formulaires</SelectItem>
             {forms.map(f => <SelectItem key={f.id} value={f.id}>{f.nom}</SelectItem>)}
@@ -90,7 +92,9 @@ export function HistoryPage() {
         </Select>
 
         <Select value={filterStatut} onValueChange={v => applyFilter(() => setFilterStatut(v ?? 'all'))}>
-          <SelectTrigger className="h-8 w-36 text-sm"><SelectValue placeholder="Statut" /></SelectTrigger>
+          <SelectTrigger className="h-8 w-36 text-sm">
+            <span>{{ all: 'Tous les statuts', soumis: 'Soumis', valide: 'Validé', rejete: 'Rejeté', brouillon: 'Brouillon' }[filterStatut] ?? filterStatut}</span>
+          </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Tous les statuts</SelectItem>
             <SelectItem value="soumis">Soumis</SelectItem>
@@ -108,7 +112,9 @@ export function HistoryPage() {
           onChange={e => applyFilter(() => setFilterDateTo(e.target.value ?? ''))} />
 
         <Select value={sortOrder} onValueChange={v => applyFilter(() => setSortOrder(v as 'desc' | 'asc'))}>
-          <SelectTrigger className="h-8 w-40 text-sm"><SelectValue /></SelectTrigger>
+          <SelectTrigger className="h-8 w-44 text-sm">
+            <span>{sortOrder === 'desc' ? "Plus récent d'abord" : "Plus ancien d'abord"}</span>
+          </SelectTrigger>
           <SelectContent>
             <SelectItem value="desc">Plus récent d'abord</SelectItem>
             <SelectItem value="asc">Plus ancien d'abord</SelectItem>
