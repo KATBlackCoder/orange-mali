@@ -70,7 +70,7 @@ export function BulkEntryTable({ fields, rows, onUpdate, onAddRow, onAddRows, on
                 {ordered.map(f => {
                   return (
                   <td key={f.id} className="px-1 py-1">
-                    {f.type === 'select' && f.options ? (
+                    {f.type === 'select' && Array.isArray(f.options) ? (
                       <Select value={row[f.id ?? ''] ?? ''} onValueChange={v => onUpdate(i, f.id ?? '', v as string)}>
                         <SelectTrigger className="h-8 min-w-30">
                           <SelectValue placeholder="Choisir..." />
@@ -81,6 +81,28 @@ export function BulkEntryTable({ fields, rows, onUpdate, onAddRow, onAddRows, on
                           ))}
                         </SelectContent>
                       </Select>
+                    ) : f.type === 'multiselect' && Array.isArray(f.options) ? (
+                      <div className="flex flex-col gap-1 py-1 min-w-40">
+                        {(f.options as string[]).map(opt => {
+                          const current = (row[f.id ?? ''] ?? '').split('|').filter(Boolean)
+                          const checked = current.includes(opt)
+                          return (
+                            <label key={opt} className="flex items-center gap-2 text-xs cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={checked}
+                                onChange={() => {
+                                  const next = checked
+                                    ? current.filter(v => v !== opt)
+                                    : [...current, opt]
+                                  onUpdate(i, f.id ?? '', next.join('|'))
+                                }}
+                              />
+                              {opt}
+                            </label>
+                          )
+                        })}
+                      </div>
                     ) : (
                       <Input
                         type={f.type === 'number' ? 'number' : f.type === 'tel' ? 'tel' : f.type === 'date' ? 'date' : 'text'}

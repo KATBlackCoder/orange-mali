@@ -13,7 +13,8 @@ const FIELD_TYPES = [
   { value: 'tel', label: 'Téléphone' },
   { value: 'number', label: 'Nombre' },
   { value: 'date', label: 'Date' },
-  { value: 'select', label: 'Liste déroulante' },
+  { value: 'select', label: 'Liste déroulante (choix unique)' },
+  { value: 'multiselect', label: 'Cases à cocher (choix multiple)' },
 ]
 
 interface Props {
@@ -57,7 +58,7 @@ export function FieldEditor({ field, onUpdate, onRemove }: Props) {
           </Select>
         </div>
 
-        {field.type === 'select' && (
+        {(field.type === 'select' || field.type === 'multiselect') && (
           <div className="space-y-1">
             <p className="text-xs text-gray-500">Options (une par ligne)</p>
             <textarea
