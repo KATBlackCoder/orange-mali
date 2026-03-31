@@ -55,11 +55,14 @@ DECLARE
   f2_visites uuid := 'c0000000-0000-0000-0000-000000000005';
 
   i          int;
+  j          int;
   tel        text;
   sup_id     uuid;
   emp_id     uuid;
   sub_id     uuid;
   row_id     uuid;
+  nb_rows    int;
+  produits   text[] := ARRAY['Orange Money','Wave','Moov Money'];
   statuts    text[] := ARRAY['soumis','valide','rejete','soumis','valide','soumis'];
 BEGIN
 
@@ -199,9 +202,11 @@ BEGIN
     (f2_visites, form2_id, 'Nombre de visites', 'number', false, 1);
 
   -- ─── SOUMISSIONS ──────────────────────────────────────────────────────────
+  -- 20 soumissions, chacune avec 5 à 15 lignes
   FOR i IN 1..20 LOOP
-    emp_id := emp_ids[i];
-    sub_id := gen_random_uuid();
+    emp_id  := emp_ids[i];
+    sub_id  := gen_random_uuid();
+    nb_rows := 5 + (i % 11);  -- entre 5 et 15 lignes selon l'indice
 
     INSERT INTO submissions (id, form_id, user_id, statut, created_at)
     VALUES (
@@ -212,21 +217,21 @@ BEGIN
       now() - ((i * 1.5)::text || ' days')::interval
     );
 
-    row_id := gen_random_uuid();
-    INSERT INTO submission_rows (id, submission_id, ordre) VALUES (row_id, sub_id, 0);
+    FOR j IN 1..nb_rows LOOP
+      row_id := gen_random_uuid();
+      INSERT INTO submission_rows (id, submission_id, ordre) VALUES (row_id, sub_id, j - 1);
 
-    IF i % 2 = 0 THEN
-      INSERT INTO row_values (row_id, field_id, valeur) VALUES
-        (row_id, f1_nom,     'Client Test ' || i),
-        (row_id, f1_montant, ((i * 500) + 1000)::text),
-        (row_id, f1_produit, CASE WHEN i % 3 = 0 THEN 'Orange Money'
-                                  WHEN i % 3 = 1 THEN 'Wave'
-                                  ELSE 'Moov Money' END);
-    ELSE
-      INSERT INTO row_values (row_id, field_id, valeur) VALUES
-        (row_id, f2_zone,    'Zone ' || i),
-        (row_id, f2_visites, (i + 5)::text);
-    END IF;
+      IF i % 2 = 0 THEN
+        INSERT INTO row_values (row_id, field_id, valeur) VALUES
+          (row_id, f1_nom,     'Client ' || i || '-' || j),
+          (row_id, f1_montant, ((j * 500) + i * 100)::text),
+          (row_id, f1_produit, produits[((i + j) % 3) + 1]);
+      ELSE
+        INSERT INTO row_values (row_id, field_id, valeur) VALUES
+          (row_id, f2_zone,    'Zone ' || i || ' secteur ' || j),
+          (row_id, f2_visites, (j + i)::text);
+      END IF;
+    END LOOP;
   END LOOP;
 
 END $$;
