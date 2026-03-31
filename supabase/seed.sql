@@ -44,12 +44,12 @@ BEGIN
 
   -- ─── Générer les UUIDs superviseurs et employés ───────────────────────────
   sup_ids := ARRAY(
-    SELECT ('d' || LPAD(i::text, 7, '0') || '-0000-0000-0000-000000000000')::uuid
-    FROM generate_series(1, 10) AS i
+    SELECT ('d' || LPAD(n::text, 7, '0') || '-0000-0000-0000-000000000000')::uuid
+    FROM generate_series(1, 10) AS n
   );
   emp_ids := ARRAY(
-    SELECT ('e' || LPAD(i::text, 7, '0') || '-0000-0000-0000-000000000000')::uuid
-    FROM generate_series(1, 60) AS i
+    SELECT ('e' || LPAD(n::text, 7, '0') || '-0000-0000-0000-000000000000')::uuid
+    FROM generate_series(1, 60) AS n
   );
 
 
