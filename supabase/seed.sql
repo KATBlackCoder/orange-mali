@@ -3,13 +3,14 @@
 -- Exécuter dans : Supabase Dashboard → SQL Editor → Run
 --
 -- Crée :
---   1 chef        | téléphone 70000000 | mot de passe ML70000000
---   2 sous-chefs  | téléphone 70000001-02 | mot de passe ML700000XX
---  10 superviseurs | téléphone 70100001-10 | mot de passe ML701000XX
---  60 employés    | téléphone 70200001-60 | mot de passe ML702000XX
+--   1 chef        | téléphone 00000001 | mot de passe ML00000001
+--   2 sous-chefs  | téléphone 00000002-03 | mot de passe ML000000XX
+--  10 superviseurs | téléphone 00010001-10 | mot de passe ML000100XX
+--  60 employés    | téléphone 00020001-60 | mot de passe ML000200XX
 --   2 formulaires avec champs
 --  20 soumissions de test (statuts variés, dates variées)
 --
+-- Les numéros 000XXXXX ne peuvent pas exister en vrai (Mali = 7XXXXXXX)
 -- Pour tout supprimer : exécuter le bloc DELETE en bas de ce fichier
 -- =============================================================
 
@@ -33,28 +34,18 @@ DELETE FROM form_fields WHERE form_id IN (
 );
 DELETE FROM forms WHERE nom LIKE 'TEST_%';
 DELETE FROM profiles WHERE first_name LIKE 'TEST_%';
-DELETE FROM auth.users
-  WHERE email LIKE '%@orangemali.local'
-  AND id IN (
-    'a0000000-0000-0000-0000-000000000001',
-    'a0000000-0000-0000-0000-000000000002',
-    'a0000000-0000-0000-0000-000000000003'
-  );
-DELETE FROM auth.users WHERE email ~ '^70[12][0-9]{6}@orangemali\.local$';
+DELETE FROM auth.users WHERE email ~ '^000[0-9]{5}@orangemali\.local$';
 -- ──────────────────────────────────────────────────────────────────────────
 
 DO $$
 DECLARE
-  -- IDs fixes pour les rôles principaux (pour pouvoir se connecter)
   chef_id    uuid := 'a0000000-0000-0000-0000-000000000001';
   sc1_id     uuid := 'a0000000-0000-0000-0000-000000000002';
   sc2_id     uuid := 'a0000000-0000-0000-0000-000000000003';
 
-  -- Tableaux d'IDs pour superviseurs et employés
   sup_ids    uuid[];
   emp_ids    uuid[];
 
-  -- IDs formulaires et champs
   form1_id   uuid := 'b0000000-0000-0000-0000-000000000001';
   form2_id   uuid := 'b0000000-0000-0000-0000-000000000002';
   f1_nom     uuid := 'c0000000-0000-0000-0000-000000000001';
@@ -72,7 +63,6 @@ DECLARE
   statuts    text[] := ARRAY['soumis','valide','rejete','soumis','valide','soumis'];
 BEGIN
 
-  -- ─── Générer les UUIDs superviseurs et employés ───────────────────────────
   sup_ids := ARRAY(
     SELECT ('d' || LPAD(n::text, 7, '0') || '-0000-0000-0000-000000000000')::uuid
     FROM generate_series(1, 10) AS n
@@ -81,7 +71,6 @@ BEGIN
     SELECT ('e' || LPAD(n::text, 7, '0') || '-0000-0000-0000-000000000000')::uuid
     FROM generate_series(1, 60) AS n
   );
-
 
   -- ─── AUTH USERS ───────────────────────────────────────────────────────────
   -- Chef
@@ -92,33 +81,31 @@ BEGIN
     created_at, updated_at
   ) VALUES (
     '00000000-0000-0000-0000-000000000000', chef_id,
-    'authenticated', 'authenticated', '70000000@orangemali.local',
-    crypt('ML70000000', gen_salt('bf')), now(),
+    'authenticated', 'authenticated', '00000001@orangemali.local',
+    crypt('ML00000001', gen_salt('bf')), now(),
     '{"provider":"email","providers":["email"]}', '{}',
     now(), now()
-  ) ON CONFLICT DO NOTHING;
+  );
 
   -- Sous-chefs
-  FOR i IN 1..2 LOOP
-    tel := '7000000' || i::text;
-    INSERT INTO auth.users (
-      instance_id, id, aud, role, email,
-      encrypted_password, email_confirmed_at,
-      raw_app_meta_data, raw_user_meta_data,
-      created_at, updated_at
-    ) VALUES (
-      '00000000-0000-0000-0000-000000000000',
-      CASE WHEN i = 1 THEN sc1_id ELSE sc2_id END,
-      'authenticated', 'authenticated', tel || '@orangemali.local',
-      crypt('ML' || tel, gen_salt('bf')), now(),
-      '{"provider":"email","providers":["email"]}', '{}',
-      now(), now()
-    ) ON CONFLICT DO NOTHING;
-  END LOOP;
+  INSERT INTO auth.users (
+    instance_id, id, aud, role, email,
+    encrypted_password, email_confirmed_at,
+    raw_app_meta_data, raw_user_meta_data,
+    created_at, updated_at
+  ) VALUES
+    ('00000000-0000-0000-0000-000000000000', sc1_id,
+     'authenticated', 'authenticated', '00000002@orangemali.local',
+     crypt('ML00000002', gen_salt('bf')), now(),
+     '{"provider":"email","providers":["email"]}', '{}', now(), now()),
+    ('00000000-0000-0000-0000-000000000000', sc2_id,
+     'authenticated', 'authenticated', '00000003@orangemali.local',
+     crypt('ML00000003', gen_salt('bf')), now(),
+     '{"provider":"email","providers":["email"]}', '{}', now(), now());
 
   -- Superviseurs
   FOR i IN 1..10 LOOP
-    tel := '701000' || LPAD(i::text, 2, '0');
+    tel := '000100' || LPAD(i::text, 2, '0');
     INSERT INTO auth.users (
       instance_id, id, aud, role, email,
       encrypted_password, email_confirmed_at,
@@ -130,12 +117,12 @@ BEGIN
       crypt('ML' || tel, gen_salt('bf')), now(),
       '{"provider":"email","providers":["email"]}', '{}',
       now(), now()
-    ) ON CONFLICT DO NOTHING;
+    );
   END LOOP;
 
   -- Employés
   FOR i IN 1..60 LOOP
-    tel := '702000' || LPAD(i::text, 2, '0');
+    tel := '000200' || LPAD(i::text, 2, '0');
     INSERT INTO auth.users (
       instance_id, id, aud, role, email,
       encrypted_password, email_confirmed_at,
@@ -147,29 +134,22 @@ BEGIN
       crypt('ML' || tel, gen_salt('bf')), now(),
       '{"provider":"email","providers":["email"]}', '{}',
       now(), now()
-    ) ON CONFLICT DO NOTHING;
+    );
   END LOOP;
 
-
   -- ─── PROFILES ─────────────────────────────────────────────────────────────
-  -- Chef
   INSERT INTO profiles (id, first_name, last_name, telephone, role, must_change_password)
-  VALUES (chef_id, 'TEST_Moussa', 'Konaté', '70000000', 'chef', false)
-  ON CONFLICT DO NOTHING;
+  VALUES (chef_id, 'TEST_Moussa', 'Konaté', '00000001', 'chef', false);
 
-  -- Sous-chef 1
   INSERT INTO profiles (id, first_name, last_name, telephone, role, parent_id, must_change_password)
-  VALUES (sc1_id, 'TEST_Fatoumata', 'Diallo', '70000001', 'sous_chef', chef_id, false)
-  ON CONFLICT DO NOTHING;
+  VALUES (sc1_id, 'TEST_Fatoumata', 'Diallo', '00000002', 'sous_chef', chef_id, false);
 
-  -- Sous-chef 2
   INSERT INTO profiles (id, first_name, last_name, telephone, role, parent_id, must_change_password)
-  VALUES (sc2_id, 'TEST_Ibrahim', 'Coulibaly', '70000002', 'sous_chef', chef_id, false)
-  ON CONFLICT DO NOTHING;
+  VALUES (sc2_id, 'TEST_Ibrahim', 'Coulibaly', '00000003', 'sous_chef', chef_id, false);
 
   -- 10 superviseurs (5 sous sc1, 5 sous sc2)
   FOR i IN 1..10 LOOP
-    tel := '701000' || LPAD(i::text, 2, '0');
+    tel := '000100' || LPAD(i::text, 2, '0');
     INSERT INTO profiles (id, first_name, last_name, telephone, role, parent_id, must_change_password)
     VALUES (
       sup_ids[i],
@@ -179,12 +159,12 @@ BEGIN
       'superviseur',
       CASE WHEN i <= 5 THEN sc1_id ELSE sc2_id END,
       false
-    ) ON CONFLICT DO NOTHING;
+    );
   END LOOP;
 
   -- 60 employés (6 par superviseur)
   FOR i IN 1..60 LOOP
-    tel := '702000' || LPAD(i::text, 2, '0');
+    tel := '000200' || LPAD(i::text, 2, '0');
     sup_id := sup_ids[((i - 1) / 6) + 1];
     INSERT INTO profiles (id, first_name, last_name, telephone, role, parent_id, must_change_password)
     VALUES (
@@ -195,39 +175,30 @@ BEGIN
       'employe',
       sup_id,
       false
-    ) ON CONFLICT DO NOTHING;
+    );
   END LOOP;
-
 
   -- ─── FORMULAIRES ──────────────────────────────────────────────────────────
   INSERT INTO forms (id, nom, description, created_by, actif)
   VALUES
     (form1_id, 'TEST_Vente Orange Money', 'Formulaire de test — transactions', chef_id, true),
-    (form2_id, 'TEST_Rapport Quotidien',  'Formulaire de test — rapport terrain', chef_id, true)
-  ON CONFLICT DO NOTHING;
+    (form2_id, 'TEST_Rapport Quotidien',  'Formulaire de test — rapport terrain', chef_id, true);
 
-  -- Champs formulaire 1
   INSERT INTO form_fields (id, form_id, label, type, requis, ordre)
   VALUES
     (f1_nom,     form1_id, 'Nom du client',  'text',   true,  0),
     (f1_montant, form1_id, 'Montant (FCFA)', 'number', true,  1),
-    (f1_produit, form1_id, 'Produit',        'select', true,  2)
-  ON CONFLICT DO NOTHING;
+    (f1_produit, form1_id, 'Produit',        'select', true,  2);
 
   UPDATE form_fields SET options = '["Orange Money","Wave","Moov Money"]'::jsonb
   WHERE id = f1_produit;
 
-  -- Champs formulaire 2
   INSERT INTO form_fields (id, form_id, label, type, requis, ordre)
   VALUES
-    (f2_zone,    form2_id, 'Zone couverte',    'text',   true,  0),
-    (f2_visites, form2_id, 'Nombre de visites','number', false, 1)
-  ON CONFLICT DO NOTHING;
-
+    (f2_zone,    form2_id, 'Zone couverte',     'text',   true,  0),
+    (f2_visites, form2_id, 'Nombre de visites', 'number', false, 1);
 
   -- ─── SOUMISSIONS ──────────────────────────────────────────────────────────
-  -- 20 soumissions réparties sur les 20 premiers employés
-  -- statuts variés, dates étalées sur les 30 derniers jours
   FOR i IN 1..20 LOOP
     emp_id := emp_ids[i];
     sub_id := gen_random_uuid();
@@ -245,7 +216,6 @@ BEGIN
     INSERT INTO submission_rows (id, submission_id, ordre) VALUES (row_id, sub_id, 0);
 
     IF i % 2 = 0 THEN
-      -- Formulaire 1 : vente
       INSERT INTO row_values (row_id, field_id, valeur) VALUES
         (row_id, f1_nom,     'Client Test ' || i),
         (row_id, f1_montant, ((i * 500) + 1000)::text),
@@ -253,7 +223,6 @@ BEGIN
                                   WHEN i % 3 = 1 THEN 'Wave'
                                   ELSE 'Moov Money' END);
     ELSE
-      -- Formulaire 2 : rapport
       INSERT INTO row_values (row_id, field_id, valeur) VALUES
         (row_id, f2_zone,    'Zone ' || i),
         (row_id, f2_visites, (i + 5)::text);
@@ -266,22 +235,22 @@ END $$;
 -- =============================================================
 -- CONNEXIONS DE TEST
 -- =============================================================
--- Rôle         | Téléphone   | Login affiché              | Mot de passe
--- -------------|-------------|----------------------------|---------------
--- chef         | 70000000    | 70000000@konaté.org        | ML70000000
--- sous_chef 1  | 70000001    | 70000001@diallo.org        | ML70000001
--- sous_chef 2  | 70000002    | 70000002@coulibaly.org     | ML70000002
--- superviseur1 | 70100001    | 70100001@sup1.org          | ML70100001
--- employé 1    | 70200001    | 70200001@emp1.org          | ML70200001
+-- Rôle         | Téléphone | Mot de passe
+-- -------------|-----------|-------------
+-- chef         | 00000001  | ML00000001
+-- sous_chef 1  | 00000002  | ML00000002
+-- sous_chef 2  | 00000003  | ML00000003
+-- superviseur1 | 00010001  | ML00010001
+-- superviseur6 | 00010006  | ML00010006  (sous sc2)
+-- employé 1    | 00020001  | ML00020001
 -- =============================================================
 
 
 -- =============================================================
--- NETTOYAGE — Supprimer toutes les données de test
--- Décommenter et exécuter pour tout effacer
+-- NETTOYAGE MANUEL — Décommenter et exécuter pour tout effacer
 -- =============================================================
 /*
-DELETE FROM row_values  WHERE row_id IN (
+DELETE FROM row_values WHERE row_id IN (
   SELECT sr.id FROM submission_rows sr
   JOIN submissions s ON s.id = sr.submission_id
   JOIN profiles p ON p.id = s.user_id
@@ -300,6 +269,5 @@ DELETE FROM form_fields WHERE form_id IN (
 );
 DELETE FROM forms WHERE nom LIKE 'TEST_%';
 DELETE FROM profiles WHERE first_name LIKE 'TEST_%';
-DELETE FROM auth.users WHERE email LIKE '%@orangemali.local'
-  AND id IN (SELECT id FROM profiles WHERE first_name LIKE 'TEST_%');
+DELETE FROM auth.users WHERE email ~ '^000[0-9]{5}@orangemali\.local$';
 */
