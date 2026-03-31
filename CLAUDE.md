@@ -54,7 +54,7 @@ When modifying or adding skills, maintain the existing structure: `SKILL.md` for
 
 ### Orange Mali PWA
 PWA mobile-first remplaçant Google Forms pour un service terrain partenaire d'Orange Money Mali.
-Plans d'implémentation : `docs/plans/2026-03-24-orange-mali-pwa.md` (index) → 7 plans séquentiels.
+Plans d'implémentation : `docs/plans/2026-03-24-orange-mali-pwa.md` (index) → 7 plans séquentiels + `docs/plans/2026-03-25-form-fields-advanced.md`.
 
 **Stack :** React 19 + TypeScript + Vite 8, Tailwind CSS v4, shadcn/ui, Supabase, Vercel
 
@@ -69,7 +69,8 @@ Plans d'implémentation : `docs/plans/2026-03-24-orange-mali-pwa.md` (index) →
 | 04 Saisie en masse | ✅ | BulkEntryTable, useSubmission, ProfileContext |
 | 05 Dashboards | ✅ | Vues par rôle (employe, superviseur, chef) |
 | 06 Admin | ✅ | CRUD users + Form Builder + Edge Function |
-| 07 Deploy | 🔲 | Export CSV + Vercel |
+| 07 Deploy | ✅ | Export CSV + Vercel (https://orange-mali.vercel.app) |
+| 08 Champs avancés | ✅ | Multiselect + champs conditionnels |
 
 **Conventions auth :**
 - Email Supabase Auth interne : `telephone@orangemali.local`
@@ -77,6 +78,13 @@ Plans d'implémentation : `docs/plans/2026-03-24-orange-mali-pwa.md` (index) →
 - Password par défaut : `ML` + telephone
 - `must_change_password = true` à la création → page changement au 1er login
 - Seuls `chef` et `sous_chef` créent des comptes (via Edge Function `create-user`)
+- Edge Function déployée avec `--no-verify-jwt` (clé `sb_publishable_` incompatible avec vérification JWT standard)
+
+**Types de champs formulaire :**
+- `text`, `tel`, `number`, `date` — saisie directe
+- `select` — liste déroulante, choix unique
+- `multiselect` — cases à cocher, valeurs stockées séparées par `|` dans `row_values.valeur`
+- Champs conditionnels : colonne `condition jsonb` sur `form_fields` — `{ fieldId, value }` — évaluée par ligne dans `BulkEntryTable`
 
 **Commandes :**
 ```bash
