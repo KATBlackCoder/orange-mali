@@ -66,7 +66,7 @@ BEGIN
     crypt('ML70000000', gen_salt('bf')), now(),
     '{"provider":"email","providers":["email"]}', '{}',
     now(), now()
-  ) ON CONFLICT (id) DO NOTHING;
+  ) ON CONFLICT DO NOTHING;
 
   -- Sous-chefs
   FOR i IN 1..2 LOOP
@@ -83,7 +83,7 @@ BEGIN
       crypt('ML' || tel, gen_salt('bf')), now(),
       '{"provider":"email","providers":["email"]}', '{}',
       now(), now()
-    ) ON CONFLICT (id) DO NOTHING;
+    ) ON CONFLICT DO NOTHING;
   END LOOP;
 
   -- Superviseurs
@@ -100,7 +100,7 @@ BEGIN
       crypt('ML' || tel, gen_salt('bf')), now(),
       '{"provider":"email","providers":["email"]}', '{}',
       now(), now()
-    ) ON CONFLICT (id) DO NOTHING;
+    ) ON CONFLICT DO NOTHING;
   END LOOP;
 
   -- Employés
@@ -117,7 +117,7 @@ BEGIN
       crypt('ML' || tel, gen_salt('bf')), now(),
       '{"provider":"email","providers":["email"]}', '{}',
       now(), now()
-    ) ON CONFLICT (id) DO NOTHING;
+    ) ON CONFLICT DO NOTHING;
   END LOOP;
 
 
@@ -125,17 +125,17 @@ BEGIN
   -- Chef
   INSERT INTO profiles (id, first_name, last_name, telephone, role, must_change_password)
   VALUES (chef_id, 'TEST_Moussa', 'Konaté', '70000000', 'chef', false)
-  ON CONFLICT (id) DO NOTHING;
+  ON CONFLICT DO NOTHING;
 
   -- Sous-chef 1
   INSERT INTO profiles (id, first_name, last_name, telephone, role, parent_id, must_change_password)
   VALUES (sc1_id, 'TEST_Fatoumata', 'Diallo', '70000001', 'sous_chef', chef_id, false)
-  ON CONFLICT (id) DO NOTHING;
+  ON CONFLICT DO NOTHING;
 
   -- Sous-chef 2
   INSERT INTO profiles (id, first_name, last_name, telephone, role, parent_id, must_change_password)
   VALUES (sc2_id, 'TEST_Ibrahim', 'Coulibaly', '70000002', 'sous_chef', chef_id, false)
-  ON CONFLICT (id) DO NOTHING;
+  ON CONFLICT DO NOTHING;
 
   -- 10 superviseurs (5 sous sc1, 5 sous sc2)
   FOR i IN 1..10 LOOP
@@ -149,7 +149,7 @@ BEGIN
       'superviseur',
       CASE WHEN i <= 5 THEN sc1_id ELSE sc2_id END,
       false
-    ) ON CONFLICT (id) DO NOTHING;
+    ) ON CONFLICT DO NOTHING;
   END LOOP;
 
   -- 60 employés (6 par superviseur)
@@ -165,7 +165,7 @@ BEGIN
       'employe',
       sup_id,
       false
-    ) ON CONFLICT (id) DO NOTHING;
+    ) ON CONFLICT DO NOTHING;
   END LOOP;
 
 
@@ -174,7 +174,7 @@ BEGIN
   VALUES
     (form1_id, 'TEST_Vente Orange Money', 'Formulaire de test — transactions', chef_id, true),
     (form2_id, 'TEST_Rapport Quotidien',  'Formulaire de test — rapport terrain', chef_id, true)
-  ON CONFLICT (id) DO NOTHING;
+  ON CONFLICT DO NOTHING;
 
   -- Champs formulaire 1
   INSERT INTO form_fields (id, form_id, label, type, requis, ordre)
@@ -182,7 +182,7 @@ BEGIN
     (f1_nom,     form1_id, 'Nom du client',  'text',   true,  0),
     (f1_montant, form1_id, 'Montant (FCFA)', 'number', true,  1),
     (f1_produit, form1_id, 'Produit',        'select', true,  2)
-  ON CONFLICT (id) DO NOTHING;
+  ON CONFLICT DO NOTHING;
 
   UPDATE form_fields SET options = '["Orange Money","Wave","Moov Money"]'::jsonb
   WHERE id = f1_produit;
@@ -192,7 +192,7 @@ BEGIN
   VALUES
     (f2_zone,    form2_id, 'Zone couverte',    'text',   true,  0),
     (f2_visites, form2_id, 'Nombre de visites','number', false, 1)
-  ON CONFLICT (id) DO NOTHING;
+  ON CONFLICT DO NOTHING;
 
 
   -- ─── SOUMISSIONS ──────────────────────────────────────────────────────────
