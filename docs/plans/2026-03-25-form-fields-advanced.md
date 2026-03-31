@@ -1,6 +1,6 @@
 # Advanced Form Fields Implementation Plan
 
-> **For agentic workers:** REQUIRED: Use superpowers:subagent-driven-development (if subagents available) or superpowers:executing-plans to implement this plan. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED: Use superpowers:subagent-driven-development (if subagents available) or superpowers:executing-plans to implement this plan. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Ajouter les types de champs multi-sélection et les champs conditionnels (affichés selon la valeur d'un autre champ) dans le Form Builder et le tableau de saisie en masse.
 
@@ -38,7 +38,7 @@ Compléter [Chunk 7: Export & Deploy](./2026-03-24-07-deploy.md) en premier.
 - Dans le tableau de saisie : affiche des checkboxes pour chaque option ; les valeurs cochées sont stockées séparées par `|` dans `row_values.valeur` (ex: `"Rouge|Bleu"`)
 - Dans le dashboard superviseur : les valeurs s'affichent telles quelles (ex: `"Rouge|Bleu"`)
 
-- [ ] **Step 1: Ajouter `multiselect` à la liste des types dans `FieldEditor.tsx`**
+- [x] **Step 1: Ajouter `multiselect` à la liste des types dans `FieldEditor.tsx`**
 
 Fichier : `src/features/admin/FieldEditor.tsx`
 
@@ -55,7 +55,7 @@ const FIELD_TYPES = [
 ]
 ```
 
-- [ ] **Step 2: Afficher le textarea d'options pour `multiselect` aussi**
+- [x] **Step 2: Afficher le textarea d'options pour `multiselect` aussi**
 
 Dans `FieldEditor.tsx`, la condition qui affiche le textarea d'options est actuellement :
 ```tsx
@@ -66,7 +66,7 @@ La changer en :
 {(field.type === 'select' || field.type === 'multiselect') && (
 ```
 
-- [ ] **Step 3: Ajouter le rendu multiselect dans `BulkEntryTable.tsx`**
+- [x] **Step 3: Ajouter le rendu multiselect dans `BulkEntryTable.tsx`**
 
 Dans `BulkEntryTable.tsx`, dans le bloc qui rend chaque cellule, après le bloc `select` et avant le bloc `Input` par défaut :
 
@@ -127,7 +127,7 @@ Placer ce bloc entre le bloc `select` et le bloc `Input` par défaut. La structu
 )}
 ```
 
-- [ ] **Step 4: Vérifier visuellement**
+- [x] **Step 4: Vérifier visuellement**
 
 1. Aller dans `/forms`, créer un formulaire avec un champ "Produits" de type "Cases à cocher"
 2. Ajouter les options : `Orange Money`, `Wave`, `Moov`
@@ -135,7 +135,7 @@ Placer ce bloc entre le bloc `select` et le bloc `Input` par défaut. La structu
 4. Vérifier que les checkboxes s'affichent et que plusieurs peuvent être cochées
 5. Soumettre — vérifier dans Supabase que `row_values.valeur` contient `"Orange Money|Wave"` (exemple)
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/features/admin/FieldEditor.tsx src/features/submissions/BulkEntryTable.tsx
@@ -163,7 +163,7 @@ git commit -m "feat: multiselect field type with pipe-separated storage"
 - Opérateur unique : égalité (`=`)
 - La condition ne peut porter que sur un champ de type `select` ou `multiselect` (valeurs prévisibles)
 
-- [ ] **Step 1: Migration SQL**
+- [x] **Step 1: Migration SQL**
 
 Créer `supabase/migrations/004_condition_field.sql` :
 
@@ -176,7 +176,7 @@ Appliquer dans le dashboard Supabase (SQL Editor) ou via CLI :
 pnpm dlx supabase db push --project-ref ibnscabashixestseais
 ```
 
-- [ ] **Step 2: Régénérer les types TypeScript**
+- [x] **Step 2: Régénérer les types TypeScript**
 
 ```bash
 pnpm dlx supabase gen types typescript --project-id ibnscabashixestseais > src/lib/database.types.ts
@@ -184,7 +184,7 @@ pnpm dlx supabase gen types typescript --project-id ibnscabashixestseais > src/l
 
 Vérifier que `form_fields.Row` contient maintenant `condition: Json | null`.
 
-- [ ] **Step 3: Ajouter le type `FieldCondition` et mettre à jour le type local**
+- [x] **Step 3: Ajouter le type `FieldCondition` et mettre à jour le type local**
 
 Dans `FieldEditor.tsx`, ajouter en haut du fichier (après les imports) :
 
@@ -195,7 +195,7 @@ interface FieldCondition {
 }
 ```
 
-- [ ] **Step 4: Ajouter l'UI de condition dans `FieldEditor.tsx`**
+- [x] **Step 4: Ajouter l'UI de condition dans `FieldEditor.tsx`**
 
 Le composant `FieldEditor` reçoit déjà `field` et `onUpdate`. Il faut aussi lui passer la liste de tous les champs du formulaire pour pouvoir choisir le champ source.
 
@@ -261,7 +261,7 @@ interface Props {
 })()}
 ```
 
-- [ ] **Step 5: Passer `allFields` depuis `FormBuilder.tsx`**
+- [x] **Step 5: Passer `allFields` depuis `FormBuilder.tsx`**
 
 Dans `FormBuilder.tsx`, le rendu de `FieldEditor` devient :
 
@@ -277,7 +277,7 @@ Dans `FormBuilder.tsx`, le rendu de `FieldEditor` devient :
 ))}
 ```
 
-- [ ] **Step 6: Sauvegarder la condition dans `FormBuilder.tsx`**
+- [x] **Step 6: Sauvegarder la condition dans `FormBuilder.tsx`**
 
 Dans la fonction `save()`, les champs sont upsertés avec `fieldsToUpsert`. Ajouter `condition` à chaque champ :
 
@@ -294,7 +294,7 @@ const fieldsToUpsert = fields.map((f, i) => ({
 }))
 ```
 
-- [ ] **Step 7: Évaluer les conditions dans `BulkEntryTable.tsx`**
+- [x] **Step 7: Évaluer les conditions dans `BulkEntryTable.tsx`**
 
 Ajouter une fonction utilitaire en haut du composant (avant le `return`) :
 
@@ -363,7 +363,7 @@ fields.forEach(dep => {
 
 Appliquer la même logique dans le onChange de multiselect.
 
-- [ ] **Step 8: Vérifier visuellement**
+- [x] **Step 8: Vérifier visuellement**
 
 1. Créer un formulaire avec :
    - Champ "Produit" (select) : options `Orange Money`, `Wave`
@@ -373,7 +373,7 @@ Appliquer la même logique dans le onChange de multiselect.
    - Ligne 2 : sélectionner "Wave" → le champ "Référence transaction" reste grisé
 3. Soumettre et vérifier en base que la valeur grisée est vide
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```bash
 git add supabase/migrations/004_condition_field.sql src/lib/database.types.ts \
