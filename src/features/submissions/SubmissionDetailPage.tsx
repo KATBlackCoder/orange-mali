@@ -3,6 +3,10 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { useProfile } from '@/contexts/ProfileContext'
 import { Button } from '@/components/ui/button'
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle,
+  DialogDescription, DialogFooter,
+} from '@/components/ui/dialog'
 import { ArrowLeft, CheckCircle, XCircle } from 'lucide-react'
 import { toast } from 'sonner'
 import type { Tables } from '@/lib/database.types'
@@ -17,6 +21,9 @@ export function SubmissionDetailPage() {
   const [fields, setFields] = useState<FormField[]>([])
   const [rows, setRows] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [rejectOpen, setRejectOpen] = useState(false)
+  const [rejectComment, setRejectComment] = useState('')
+  const [rejecting, setRejecting] = useState(false)
 
   useEffect(() => {
     if (!id) return
@@ -45,9 +52,18 @@ export function SubmissionDetailPage() {
     toast.success('Remontée validée')
   }
 
-  async function reject() {
-    await supabase.from('submissions').update({ statut: 'rejete' }).eq('id', id!)
-    setSubmission((s: any) => ({ ...s, statut: 'rejete' }))
+  async function confirmReject() {
+    if (!rejectComment.trim()) return
+    setRejecting(true)
+    const { error } = await supabase
+      .from('submissions')
+      .update({ statut: 'rejete', commentaire: rejectComment.trim() })
+      .eq('id', id!)
+    setRejecting(false)
+    if (error) { toast.error('Erreur lors du rejet'); return }
+    setSubmission((s: any) => ({ ...s, statut: 'rejete', commentaire: rejectComment.trim() }))
+    setRejectOpen(false)
+    setRejectComment('')
     toast.error('Remontée rejetée')
   }
 
@@ -86,7 +102,7 @@ export function SubmissionDetailPage() {
 
       {canReview && isPending && (
         <div className="flex gap-2 justify-end">
-          <Button variant="outline" className="text-red-500 hover:text-red-600" onClick={reject}>
+          <Button variant="outline" className="text-red-500 hover:text-red-600" onClick={() => setRejectOpen(true)}>
             <XCircle className="w-4 h-4 mr-1" /> Rejeter
           </Button>
           <Button className="bg-green-500 hover:bg-green-600" onClick={validate}>
@@ -95,7 +111,13 @@ export function SubmissionDetailPage() {
         </div>
       )}
 
-      {/* Tableau des lignes */}
+      {submission.statut === 'rejete' && submission.commentaire && (
+        <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3">
+          <p className="text-xs font-semibold text-red-600 uppercase tracking-wide mb-1">Motif du rejet</p>
+          <p className="text-sm text-red-700">{submission.commentaire}</p>
+        </div>
+      )}
+
       {fields.length > 0 && rows.length > 0 ? (
         <div className="overflow-x-auto rounded-md border bg-white">
           <table className="w-full text-sm">
@@ -127,6 +149,36 @@ export function SubmissionDetailPage() {
       ) : (
         <p className="text-gray-500 text-sm">Aucune donnée dans cette remontée.</p>
       )}
+
+      <Dialog open={rejectOpen} onOpenChange={setRejectOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Rejeter la remontée</DialogTitle>
+            <DialogDescription>
+              Expliquez à l'employé la raison du rejet. Ce commentaire lui sera visible.
+            </DialogDescription>
+          </DialogHeader>
+          <textarea
+            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring resize-none min-h-[100px]"
+            placeholder="Ex : Données manquantes sur la colonne Montant..."
+            value={rejectComment}
+            onChange={e => setRejectComment(e.target.value)}
+            autoFocus
+          />
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setRejectOpen(false); setRejectComment('') }} disabled={rejecting}>
+              Annuler
+            </Button>
+            <Button
+              className="bg-red-500 hover:bg-red-600 text-white"
+              onClick={confirmReject}
+              disabled={!rejectComment.trim() || rejecting}
+            >
+              {rejecting ? 'Rejet...' : 'Confirmer le rejet'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

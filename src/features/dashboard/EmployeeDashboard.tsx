@@ -75,16 +75,24 @@ export function EmployeeDashboard() {
           )}
           <div className="divide-y">
             {submissions.map(s => (
-              <div key={s.id} className="flex items-center justify-between py-3">
-                <div>
-                  <p className="font-medium text-sm">{(s.forms as any)?.nom}</p>
-                  <p className="text-xs text-gray-400">
-                    {new Date(s.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}
-                  </p>
+              <div key={s.id} className="py-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium text-sm">{(s.forms as any)?.nom}</p>
+                    <p className="text-xs text-gray-400">
+                      {new Date(s.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}
+                    </p>
+                  </div>
+                  <span className={`text-xs px-2 py-1 rounded-full font-medium ${statutColors[s.statut ?? 'brouillon']}`}>
+                    {statutLabel[s.statut ?? 'brouillon']}
+                  </span>
                 </div>
-                <span className={`text-xs px-2 py-1 rounded-full font-medium ${statutColors[s.statut ?? 'brouillon']}`}>
-                  {statutLabel[s.statut ?? 'brouillon']}
-                </span>
+                {s.statut === 'rejete' && s.commentaire && (
+                  <div className="mt-2 rounded-md border border-orange-200 bg-orange-50 px-3 py-2">
+                    <p className="text-xs font-semibold text-orange-600 uppercase tracking-wide mb-0.5">Motif du rejet</p>
+                    <p className="text-xs text-orange-800">{s.commentaire}</p>
+                  </div>
+                )}
               </div>
             ))}
           </div>
