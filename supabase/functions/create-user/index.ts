@@ -42,7 +42,7 @@ Deno.serve(async (req) => {
     must_change_password: true,
   })
 
-  const displayLogin = `${tel}@${last_name.toLowerCase()}.org`
+  const displayLogin = tel
 
   return new Response(JSON.stringify({
     id: user!.id,
