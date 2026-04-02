@@ -20,7 +20,8 @@
 | 6 | [2026-03-24-06-admin.md](./2026-03-24-06-admin.md) | Gestion utilisateurs & Form Builder — CRUD utilisateurs, form builder drag-and-drop, Edge Function création compte | Gestion utilisateurs + formulaires |
 | 7 | [2026-03-24-07-deploy.md](./2026-03-24-07-deploy.md) | Export & Deploy — export CSV, déploiement Vercel | App en production ✅ |
 | 8 | [2026-03-25-form-fields-advanced.md](./2026-03-25-form-fields-advanced.md) | Champs avancés — multiselect + champs conditionnels | Formulaires enrichis ✅ |
-| 9 | [2026-03-31-historique-equipe.md](./2026-03-31-historique-equipe.md) | Historique soumissions + détail + vue équipe superviseur | Consultation complète |
+| 9 | [2026-03-31-historique-equipe.md](./2026-03-31-historique-equipe.md) | Historique soumissions + détail + vue équipe superviseur | Consultation complète ✅ |
+| 10 | [2026-04-02-corrections-roles-redirect.md](./2026-04-02-corrections-roles-redirect.md) | Guards de rôle routes admin, scope superviseur, redirect changement de mot de passe | Corrections post-deploy ✅ |
 
 ---
 
@@ -29,5 +30,5 @@
 Chaque plan doit être complété dans l'ordre. Chaque fichier indique son prérequis et le plan suivant.
 
 ```
-01-setup → 02-database → 03-auth → 04-bulk-entry → 05-dashboards → 06-admin → 07-deploy → 08-form-fields-advanced → 09-historique-equipe
+01-setup → 02-database → 03-auth → 04-bulk-entry → 05-dashboards → 06-admin → 07-deploy → 08-form-fields-advanced → 09-historique-equipe → 10-corrections-roles-redirect
 ```

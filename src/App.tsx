@@ -13,7 +13,7 @@ import { FormBuilder } from '@/features/admin/FormBuilder'
 import { HistoryPage } from '@/features/submissions/HistoryPage'
 import { SubmissionDetailPage } from '@/features/submissions/SubmissionDetailPage'
 
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
+function ProtectedRoute({ children, roles }: { children: React.ReactNode; roles?: string[] }) {
   const { user, loading } = useAuth()
   const profile = useProfile()
   const profileLoaded = useProfileLoaded()
@@ -22,6 +22,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   )
   if (!user) return <Navigate to="/login" replace />
   if (profile?.must_change_password) return <ChangePasswordPage />
+  if (roles && profile && !roles.includes(profile.role)) return <Navigate to="/" replace />
   return <>{children}</>
 }
 
@@ -30,22 +31,22 @@ function AppRoutes() {
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/users" element={
-        <ProtectedRoute>
+        <ProtectedRoute roles={['chef', 'sous_chef']}>
           <Layout><UsersPage /></Layout>
         </ProtectedRoute>
       } />
       <Route path="/forms" element={
-        <ProtectedRoute>
+        <ProtectedRoute roles={['chef', 'sous_chef']}>
           <Layout><FormsPage /></Layout>
         </ProtectedRoute>
       } />
       <Route path="/forms/new" element={
-        <ProtectedRoute>
+        <ProtectedRoute roles={['chef', 'sous_chef']}>
           <Layout><FormBuilder /></Layout>
         </ProtectedRoute>
       } />
       <Route path="/forms/:formId/edit" element={
-        <ProtectedRoute>
+        <ProtectedRoute roles={['chef', 'sous_chef']}>
           <Layout><FormBuilder /></Layout>
         </ProtectedRoute>
       } />

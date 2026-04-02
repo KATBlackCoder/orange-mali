@@ -54,7 +54,7 @@ When modifying or adding skills, maintain the existing structure: `SKILL.md` for
 
 ### Orange Mali PWA
 PWA mobile-first remplaçant Google Forms pour un service terrain partenaire d'Orange Money Mali.
-Plans d'implémentation : `docs/plans/2026-03-24-orange-mali-pwa.md` (index) → 7 plans séquentiels + `docs/plans/2026-03-25-form-fields-advanced.md`.
+Plans d'implémentation : `docs/plans/2026-03-24-orange-mali-pwa.md` (index) → 10 plans séquentiels.
 
 **Stack :** React 19 + TypeScript + Vite 8, Tailwind CSS v4, shadcn/ui, Supabase, Vercel
 
@@ -72,10 +72,11 @@ Plans d'implémentation : `docs/plans/2026-03-24-orange-mali-pwa.md` (index) →
 | 07 Deploy | ✅ | Export CSV + Vercel (https://orange-mali.vercel.app) |
 | 08 Champs avancés | ✅ | Multiselect + champs conditionnels |
 | 09 Historique & équipe | ✅ | HistoryPage `/history`, SubmissionDetailPage `/submissions/:id`, MyTeamSection superviseur |
+| 10 Corrections rôles | ✅ | Guards de rôle routes admin, scope superviseur, redirect changement MDP |
 
 **Conventions auth :**
 - Email Supabase Auth interne : `telephone@orangemali.local`
-- Login affiché : `telephone@last_name.org`
+- Login affiché : numéro de téléphone uniquement
 - Password par défaut : `ML` + telephone
 - `must_change_password = true` à la création → page changement au 1er login
 - Seuls `chef` et `sous_chef` créent des comptes (via Edge Function `create-user`)

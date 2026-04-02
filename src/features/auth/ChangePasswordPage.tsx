@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { useProfile } from '@/contexts/ProfileContext'
+import { useProfile, useRefreshProfile } from '@/contexts/ProfileContext'
 
 export function ChangePasswordPage() {
   const [password, setPassword] = useState('')
@@ -14,6 +14,7 @@ export function ChangePasswordPage() {
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
   const profile = useProfile()
+  const refreshProfile = useRefreshProfile()
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -23,6 +24,7 @@ export function ChangePasswordPage() {
     const { error: authError } = await supabase.auth.updateUser({ password })
     if (authError) { setError(authError.message); setLoading(false); return }
     await supabase.from('profiles').update({ must_change_password: false }).eq('id', profile!.id)
+    await refreshProfile()
     navigate('/')
   }
 

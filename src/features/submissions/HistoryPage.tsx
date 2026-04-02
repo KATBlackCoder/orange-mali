@@ -36,8 +36,21 @@ export function HistoryPage() {
     supabase.from('forms').select('id, nom').then(({ data }) => setForms(data ?? []))
   }, [])
 
+  const [employeeIds, setEmployeeIds] = useState<string[] | null>(null)
+
   useEffect(() => {
     if (!profile) return
+    if (profile.role === 'superviseur') {
+      supabase.from('profiles').select('id').eq('parent_id', profile.id)
+        .then(({ data }) => setEmployeeIds((data ?? []).map(e => e.id)))
+    } else {
+      setEmployeeIds(null) // null = pas de filtre (chef/sous_chef voient tout)
+    }
+  }, [profile])
+
+  useEffect(() => {
+    if (!profile) return
+    if (profile.role === 'superviseur' && employeeIds === null) return // attend la liste
     setLoading(true)
     let query = supabase
       .from('submissions')
@@ -45,9 +58,9 @@ export function HistoryPage() {
       .order('created_at', { ascending: sortOrder === 'asc' })
       .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1)
 
-    // Superviseur : uniquement les soumissions de ses employés
-    if (profile.role === 'superviseur') {
-      query = query.eq('profiles.parent_id', profile.id)
+    if (employeeIds !== null) {
+      if (employeeIds.length === 0) { setSubmissions([]); setLoading(false); return }
+      query = query.in('user_id', employeeIds)
     }
     if (filterForm !== 'all') query = query.eq('form_id', filterForm)
     if (filterStatut !== 'all') query = query.eq('statut', filterStatut)
@@ -59,7 +72,7 @@ export function HistoryPage() {
       else setSubmissions(prev => [...prev, ...(data ?? [])])
       setLoading(false)
     })
-  }, [profile, filterForm, filterStatut, filterDateFrom, filterDateTo, sortOrder, page])
+  }, [profile, employeeIds, filterForm, filterStatut, filterDateFrom, filterDateTo, sortOrder, page])
 
   // Reset pagination when filters change
   function applyFilter(fn: () => void) { setPage(0); fn() }

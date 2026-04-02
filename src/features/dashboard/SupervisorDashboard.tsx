@@ -14,11 +14,17 @@ export function SupervisorDashboard() {
 
   useEffect(() => {
     if (!profile) return
-    supabase.from('submissions')
-      .select('*, profiles(first_name, last_name, telephone), forms(nom)')
-      .order('created_at', { ascending: false })
-      .limit(50)
-      .then(({ data }) => { setSubmissions(data ?? []); setLoading(false) })
+    supabase.from('profiles').select('id').eq('parent_id', profile.id)
+      .then(({ data: employees }) => {
+        const ids = (employees ?? []).map(e => e.id)
+        if (ids.length === 0) { setLoading(false); return }
+        supabase.from('submissions')
+          .select('*, profiles(first_name, last_name, telephone), forms(nom)')
+          .in('user_id', ids)
+          .order('created_at', { ascending: false })
+          .limit(50)
+          .then(({ data }) => { setSubmissions(data ?? []); setLoading(false) })
+      })
   }, [profile])
 
   async function validate(id: string) {
