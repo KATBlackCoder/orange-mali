@@ -123,7 +123,9 @@ export function UserFormDialog({ open, onClose, onSaved, editUser, supervisors }
           <div className="space-y-1">
             <Label>Rôle</Label>
             <Select value={role} onValueChange={v => setRole(v as UserRole)}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <span>{{ employe: 'Employé', superviseur: 'Superviseur', sous_chef: 'Sous-chef', chef: 'Chef' }[role]}</span>
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="employe">Employé</SelectItem>
                 <SelectItem value="superviseur">Superviseur</SelectItem>
@@ -140,7 +142,9 @@ export function UserFormDialog({ open, onClose, onSaved, editUser, supervisors }
             <div className="space-y-1">
               <Label>Superviseur rattaché <span className="text-gray-400 text-xs">(optionnel)</span></Label>
               <Select value={parentId} onValueChange={(v) => setParentId(v ?? '')}>
-                <SelectTrigger><SelectValue placeholder="Aucun" /></SelectTrigger>
+                <SelectTrigger>
+                  <span>{parentId ? (supervisors.find(s => s.id === parentId)?.first_name + ' ' + supervisors.find(s => s.id === parentId)?.last_name) : 'Aucun'}</span>
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="">Aucun</SelectItem>
                   {supervisors.map(s => (
